@@ -4,11 +4,19 @@ const app = express()
 const seed = require('./seed')
 seed()
 
-const {db}= require('./db')
+
 const{Movie}= require('./models/Index')
 const{User}= require('./models/Index')
 
+
+
 app.use(express.json())
+
+app.get('/users', async(req,res)=>{
+    let allUsers = await User.findAll()
+    res.json({allUsers})
+})
+
 app.get('/',async(req, res)=>{
     res.redirect('/movies')
 })
@@ -18,7 +26,7 @@ app.get('/movies',async (req,res)=>{
     res.json({allMovies})
 })
 
-app.get('/movies/:id', async (req,res)=>{
+app.get('/movie/:id', async (req,res)=>{
     let id = req.params.id;
     let movie = await Movie.findByPk(id);
     res.json({movie})
@@ -28,6 +36,13 @@ app.post('/movie', async (req, res) => {
         res.status(201).json(movie)
     });
 	res.send(`New Movie added`);
+});
+
+app.post('/user', async (req, res) => {
+	await User.create(req.body).then((user) => {
+		res.status(201).json(user);
+	});
+	res.send(`New User added`);
 });
 
 app.put('/movie/:id', async (req, res) => {
@@ -47,6 +62,23 @@ app.delete('/movie/:id', async (req, res) => {
 		where: { id: req.params.id },
 	});
 	res.send(`song deleted`);
+});
+
+app.get('/movies/:userId', async (req, res) => {
+	const { userId } = req.params;
+
+	const show = await Movie.findAll({
+		include: [
+			{
+				model: User,
+				required: true,
+			},
+		],
+		where: {
+			UserId: userId,
+		},
+	});
+	res.json(show);
 });
 
 

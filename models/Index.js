@@ -1,7 +1,4 @@
-const {db,DataTypes,Model}= require('../db')
-
-class Index extends Model{}
-
+// const {db,DataTypes,Model}= require('../db')
 
 const{Movie}= require('./Movie')
 const{User}=require('./User')
